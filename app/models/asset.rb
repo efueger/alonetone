@@ -1,4 +1,6 @@
 class Asset < ActiveRecord::Base
+  acts_as_paranoid
+
   concerned_with :uploading, :radio, :statistics, :greenfield
   attribute :user_agent, :string
 
@@ -10,12 +12,13 @@ class Asset < ActiveRecord::Base
   scope :random_order,    -> { order("RAND()") }
   scope :favorited,       -> { select('distinct assets.*').includes(:tracks).where('tracks.is_favorite = (?)', true).order('tracks.id DESC') }
   scope :not_current,     ->(id) { where('id != ?', id) }
+
   belongs_to :user, counter_cache: true
   has_one  :audio_feature
-  has_many :tracks,    dependent: :destroy
+  has_many :tracks
   has_many :playlists, through: :tracks
-  has_many :listens,   -> { order('listens.created_at DESC') }, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
+  has_many :listens,   -> { order('listens.created_at DESC') }
+  has_many :comments, as: :commentable
 
   has_many :listeners,
     -> { distinct.order('listens.created_at DESC') },
