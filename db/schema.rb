@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_04_011838) do
+ActiveRecord::Schema.define(version: 2018_12_31_044628) do
 
   create_table "assets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "mp3_content_type"
@@ -614,6 +614,8 @@ ActiveRecord::Schema.define(version: 2018_12_04_011838) do
     t.integer "bandwidth_used", default: 0
     t.boolean "greenfield_enabled", default: false
     t.boolean "use_old_theme", default: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["updated_at"], name: "index_users_on_updated_at"
   end
 
