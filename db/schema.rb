@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_31_044628) do
+ActiveRecord::Schema.define(version: 2018_12_31_045257) do
 
   create_table "assets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "mp3_content_type"
@@ -42,6 +42,8 @@ ActiveRecord::Schema.define(version: 2018_12_31_044628) do
     t.boolean "private", default: false, null: false
     t.integer "id3_track_num", default: 1
     t.boolean "is_spam", default: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_assets_on_deleted_at"
     t.index ["hotness"], name: "index_assets_on_hotness"
     t.index ["permalink"], name: "index_assets_on_permalink"
     t.index ["updated_at"], name: "index_assets_on_updated_at"
