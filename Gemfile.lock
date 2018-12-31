@@ -281,6 +281,8 @@ GEM
       mimemagic (~> 0.3.0)
       terrapin (~> 0.6.0)
     parallel (1.12.1)
+    paranoia (2.4.1)
+      activerecord (>= 4.0, < 5.3)
     parser (2.5.3.0)
       ast (~> 2.4.0)
     percy-capybara (3.2.0)
@@ -540,6 +542,7 @@ DEPENDENCIES
   newrelic_rpm
   pagy
   paperclip (~> 6.0.0)
+  paranoia (~> 2.2)
   percy-capybara
   perf_check
   postmark-rails
