@@ -101,6 +101,7 @@ group :test do
   gem 'listen', :require => false
   # https://github.com/thoughtbot/factory_bot/wiki/Usage
   gem 'factory_bot_rails',:require => false
+  gem 'shoulda-matchers', '4.0.0.rc1'
   gem 'rails-controller-testing'
 end
 
