@@ -1,15 +1,6 @@
 require "rails_helper"
-include ActiveJob::TestHelper
 
 RSpec.describe AssetsController, type: :controller do
-  render_views
-  fixtures :assets, :users, :audio_features
-
-  before :each do
-    clear_enqueued_jobs
-    clear_performed_jobs
-  end
-
   context "new" do
     it 'should display limit reached flash for new users with >= 25 tracks' do
       login(:brand_new_user)
