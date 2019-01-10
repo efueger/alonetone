@@ -10,13 +10,13 @@ gem 'greenfield', path: 'greenfield'
 
 # ruby
 gem 'sometimes'
-gem 'awesome_print', :require => 'ap'
+gem 'awesome_print', require: 'ap'
 
 # uploading
 gem 'aws-sdk-s3'
 gem 'paperclip', '~> 6.0.0'
 gem 'rubyzip'
-gem 'ruby-mp3info', :require => 'mp3info'
+gem 'ruby-mp3info', require: 'mp3info'
 gem 'mime-types'
 gem 'ruby-audio'
 gem 's3_direct_upload'
@@ -71,8 +71,6 @@ gem 'skylight'
 gem 'sidekiq'
 gem 'dalli'
 
-
-
 group :production do
   gem 'puma'
   gem 'bugsnag'
@@ -88,21 +86,19 @@ end
 
 ## Who loves tests! You do? You do!
 group :test do
-  gem 'selenium-webdriver'
-  gem 'chromedriver-helper'
   gem 'capybara'
+  gem 'chromedriver-helper'
+  gem 'guard', require: false
+  gem 'guard-rspec', require: false
+  gem 'listen', require: false
   gem 'percy-capybara'
-  gem 'rspec-rails', :require => false
-  gem 'rspec-mocks', :require => false
-  gem 'guard-rspec', :require => false
-  gem 'database_cleaner', :require => false
-  gem 'rb-fsevent', :require => false
-  gem 'guard', :require => false
-  gem 'listen', :require => false
-  # https://github.com/thoughtbot/factory_bot/wiki/Usage
-  gem 'factory_bot_rails',:require => false
   gem 'shoulda-matchers', '4.0.0.rc1'
   gem 'rails-controller-testing'
+  gem 'rb-fsevent', require: false
+  gem 'rspec-mocks', require: false
+  gem 'rspec-rails', require: false
+  gem 'selenium-webdriver'
+  gem 'webmock', require: false
 end
 
 group :development, :test do
