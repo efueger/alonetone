@@ -19,9 +19,9 @@ module Listens
       if Rails.application.play_dummy_audio?
         play_local_mp3
       elsif Rails.application.cloudfront_enabled?
-        redirect_to cloudfront_url(asset.mp3.url)
+        redirect_to cloudfront_url(asset.public_url)
       else
-        redirect_to asset.mp3.expiring_url
+        redirect_to asset.presigned_url
       end
     end
   end

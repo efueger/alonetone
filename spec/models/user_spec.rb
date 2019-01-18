@@ -56,6 +56,15 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "uploading" do
+    it "should increase the user's asset count" do
+      user = users(:sudara)
+      expect do
+        file_fixture_asset('muppets.mp3', content_type: 'audio/mpeg', user: user)
+      end.to change { user.reload.assets_count }.by(+1)
+    end
+  end
+
   protected
 
   def new_user(options = {})

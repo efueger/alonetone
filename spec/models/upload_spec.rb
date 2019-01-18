@@ -8,10 +8,10 @@ RSpec.describe Upload, type: :model do
   let(:playlist_attributes) { nil }
   let(:uploaded_filename) { 'smallest.zip' }
   let(:uploaded_file) do
-    ActionDispatch::Http::UploadedFile.new(
-      tempfile: file_fixture_tempfile(uploaded_filename),
+    file_fixture_uploaded_file(
+      uploaded_filename,
       filename: uploaded_filename,
-      type: 'application/zip'
+      content_type: MIME::Types.type_for(uploaded_filename).first.content_type
     )
   end
   let(:upload) do
@@ -41,6 +41,36 @@ RSpec.describe Upload, type: :model do
         files: [{ error: :blank }],
         user: [{ error: :blank }]
       )
+    end
+  end
+
+  context 'with MP3' do
+    let(:uploaded_filename) { 'piano.mp3' }
+    
+    it 'processes and creates an asset' do
+      expect do
+        expect do
+          expect(upload.process).to eq(true)
+        end.to change { Asset.count }.by(+1)
+      end.to_not change { Playlist.count }
+
+      expect(upload.playlists).to be_empty
+      expect(upload.assets.length).to eq(1)
+    end
+  end
+
+  context 'slightly broken MP3 file with weird filename' do
+    let(:uploaded_filename) { '_ .mp3' }
+    
+    it 'processes and creates an asset' do
+      expect do
+        expect do
+          expect(upload.process).to eq(true)
+        end.to change { Asset.count }.by(+1)
+      end.to_not change { Playlist.count }
+
+      expect(upload.playlists).to be_empty
+      expect(upload.assets.length).to eq(1)
     end
   end
 
@@ -107,10 +137,10 @@ RSpec.describe Upload, type: :model do
     end
     let(:uploaded_files) do
       uploaded_filenames.map do |uploaded_filename|
-        ActionDispatch::Http::UploadedFile.new(
-          tempfile: file_fixture_tempfile(uploaded_filename),
+        file_fixture_uploaded_file(
+          uploaded_filename,
           filename: uploaded_filename,
-          type: 'application/octet-stream'
+          content_type: MIME::Types.type_for(uploaded_filename).first.content_type
         )
       end
     end

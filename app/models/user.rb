@@ -1,4 +1,6 @@
-class User < ActiveRecord::Base
+# frozen_string_literal: true
+
+class User < ApplicationRecord
   concerned_with :validation, :findability, :settings, :statistics
 
   store :settings
@@ -23,7 +25,6 @@ class User < ActiveRecord::Base
   after_create :create_profile
 
   # Can create music
-  has_one    :pic, as: :picable, dependent: :destroy
   has_one    :profile, dependent: :destroy
   has_many   :assets,
     -> { order('assets.id DESC') },
@@ -75,6 +76,8 @@ class User < ActiveRecord::Base
 
   # will be removed along with /greenfield
   has_many :greenfield_posts, through: :assets
+
+  has_one_attached :avatar_image
 
   def listened_to_today_ids
     listens.select('listens.asset_id').where(['listens.created_at > ?', 1.day.ago]).pluck(:asset_id)

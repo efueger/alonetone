@@ -12,6 +12,9 @@ class Upload
     # orignal filename,
     attr_accessor :file
 
+    # Content-type of the posted data if known.
+    attr_accessor :content_type
+
     # The user who originate the upload.
     attr_accessor :user
 

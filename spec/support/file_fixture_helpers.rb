@@ -27,10 +27,12 @@ module RSpec
       end
 
       def file_fixture_asset(path, filename: nil, content_type: nil, user: nil)
-        Asset.create(
+        Upload.process(
           user: user || users(:sudara),
-          mp3: file_fixture_uploaded_file(path, filename: filename, content_type: content_type)
-        )
+          files: [
+            file_fixture_uploaded_file(path, filename: filename, content_type: content_type)
+          ]
+        ).assets.first
       end
     end
   end

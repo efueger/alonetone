@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# An asset represents an audio track.
 class Asset < ApplicationRecord
   concerned_with :radio, :statistics, :greenfield
   attribute :user_agent, :string
@@ -33,8 +34,9 @@ class Asset < ApplicationRecord
     source: :user,
     through: :tracks
 
+  has_one_attached :audio_file
+
   has_permalink :name, true
-  before_update :generate_permalink!, if: :title_changed?
   after_create :notify_followers, if: :published?
   after_commit :create_waveform, on: :create
 
@@ -46,12 +48,55 @@ class Asset < ApplicationRecord
                   user_role: proc { role },
                   comment_type: 'mp3-post' # this can't be "mp3", it calls paperclip
 
-  validates_presence_of :user_id
+  validates :user, presence: true
+  validates :audio_file, attached: {
+    content_type: %w[audio/mpeg audio/mp3 audio/x-mp3],
+    byte_size: { less_than: 60.megabytes }
+  }
 
-  # override has_permalink method to ensure we don't get empty permas
-  def generate_permalink!
-    self.permalink = fix_duplication(normalize(send(generate_from)))
-    self.permalink = fix_duplication("untitled") unless permalink.present?
+  # @deprecated Please use asset.audio_file.filename.
+  def mp3_file_name
+    if filename = audio_file&.filename
+      filename.to_s
+    end
+  end
+
+  # @deprecated Please use asset.audio_file.byte_size.
+  def mp3_file_size
+    audio_file&.byte_size
+  end
+
+  # @deprecated Please use asset.audio_file.content_type.
+  def mp3_content_type
+    audio_file&.content_type
+  end
+
+  # Returns a name for the asset based on its title or filename.
+  def name
+    return title.strip if title.present?
+
+    name = File.basename(mp3_file_name.to_s, '.*').humanize
+    name.blank? ? 'untitled' : name
+  end
+
+  # Generate permalink for the instance if the permalink is blank or when the title changed.
+  def generate_permalink
+    return if permalink.present? && !title_changed?
+
+    self.permalink = fix_duplication(normalize(name)).presence || 'untitled'
+  end
+
+  # Returns a URL to the object on remote storage or nil when the file is stored on disk.
+  def public_url
+    return nil unless audio_file
+    return nil unless audio_file.service.respond_to?(:bucket)
+
+    audio_file.service.bucket.object(audio_file.key).public_url
+  end
+
+  # Returns a presigned URL which gives temporary access to the file.
+  def presigned_url
+    audio_file&.service_url
   end
 
   def self.latest(limit = 10)
@@ -81,14 +126,6 @@ class Asset < ApplicationRecord
   # TODO: this is a view concern, move to helper, or better yet, deal w/it in .js
   def unique_id
     object_id
-  end
-
-  # make sure the title is there, and if not, the filename is used...
-  def name
-    return title.strip if title.present?
-
-    name = File.basename(mp3_file_name.to_s, '.*').humanize
-    name.blank? ? 'untitled' : name
   end
 
   def first_playlist

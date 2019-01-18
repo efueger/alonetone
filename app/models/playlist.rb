@@ -7,11 +7,10 @@ class Playlist < ActiveRecord::Base
   scope :only_public,      -> { where(private: false).where(is_favorite: false).where("tracks_count > 1") }
   scope :include_private,  -> { where(is_favorite: false) }
   scope :recent,           -> { order('playlists.created_at DESC')                                                }
-  scope :with_pic,         -> { preload(:pic)                                                                     }
+  scope :with_pic,         -> { preload(:cover_image)                                                                     }
   scope :for_home,         -> { select('distinct playlists.user_id, playlists.*').recent.only_public.with_pic.includes(:user) }
 
   belongs_to :user, counter_cache: true
-  has_one  :pic, as: :picable, dependent: :destroy
   has_many :tracks,
      -> { order(:position).includes(asset: :user) },
      dependent: :destroy
@@ -22,6 +21,8 @@ class Playlist < ActiveRecord::Base
 
   has_many :greenfield_downloads, class_name: '::Greenfield::PlaylistDownload', dependent: :destroy
   accepts_nested_attributes_for :greenfield_downloads
+
+  has_one_attached :cover_image
 
   validates_presence_of :title, :user_id
   validates_length_of   :title, within: 3..100
@@ -53,11 +54,12 @@ class Playlist < ActiveRecord::Base
   def cover(size = nil)
     return dummy_pic(size) if has_no_cover?
 
-    pic.pic.url(size)
+    size ||= 200
+    cover_image.variant(resize_to_fit: [size, size])
   end
 
   def has_no_cover?
-    Rails.application.show_dummy_image? || !pic.present? || pic.new_record? || !pic.try(:pic).present?
+    Rails.application.show_dummy_image? || !cover_image
   end
 
   def has_tracks?
